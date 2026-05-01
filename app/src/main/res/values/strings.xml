@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Minimal UPI Lite</string>
+    <string name="scan_hint">Scan UPI QR</string>
+    <string name="scan_bottom_hint">Fast scan. Minimal screen. Hold to confirm.</string>
+    <string name="history">History</string>
+    <string name="amount_hint">Amount</string>
+    <string name="pay_button_default">Pay</string>
+    <string name="hold_to_pay">Hold to Pay</string>
+    <string name="sending">Sending…</string>
+    <string name="no_recent_payments">No recent payments</string>
+</resources>
