@@ -31,7 +31,11 @@ class ScannerActivity : AppCompatActivity() {
     private val requestPermission = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { granted ->
-        if (granted) startCamera() else Toast.makeText(this, "Camera needed for QR scan", Toast.LENGTH_SHORT).show()
+        if (granted) {
+            startCamera()
+        } else {
+            Toast.makeText(this, "Camera needed for QR scan", Toast.LENGTH_SHORT).show()
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -54,22 +58,24 @@ class ScannerActivity : AppCompatActivity() {
         val providerFuture = ProcessCameraProvider.getInstance(this)
         providerFuture.addListener({
             val cameraProvider = providerFuture.get()
-            val preview = androidx.camera.core.Preview.Builder().build().also {
-                it.setSurfaceProvider(binding.previewView.surfaceProvider)
-            }
 
-            val analyzer = ImageAnalysis.Builder()
+            val preview = androidx.camera.core.Preview.Builder()
+                .build()
+                .also {
+                    it.setSurfaceProvider(binding.previewView.surfaceProvider)
+                }
+
+            val analysis = ImageAnalysis.Builder()
                 .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
                 .build()
-                .also { analysis ->
-                    analysis.setAnalyzer(cameraExecutor) { imageProxy ->
-                        analyzeFrame(imageProxy)
-                    }
-                }
+
+            analysis.setAnalyzer(cameraExecutor) { imageProxy ->
+                analyzeFrame(imageProxy)
+            }
 
             val selector = CameraSelector.DEFAULT_BACK_CAMERA
             cameraProvider.unbindAll()
-            cameraProvider.bindToLifecycle(this, selector, preview, analyzer)
+            cameraProvider.bindToLifecycle(this, selector, preview, analysis)
         }, ContextCompat.getMainExecutor(this))
     }
 
@@ -81,28 +87,40 @@ class ScannerActivity : AppCompatActivity() {
         }
 
         val image = InputImage.fromMediaImage(mediaImage, imageProxy.imageInfo.rotationDegrees)
+
         barcodeScanner.process(image)
             .addOnSuccessListener { barcodes ->
                 if (scanned.get()) return@addOnSuccessListener
-                val match = barcodes.firstNotNullOfOrNull { barcode ->
-                    val raw = barcode.rawValue ?: return@firstNotNullOrNull null
-                    UpiParser.parse(raw)
+
+                var matchedScan: UpiScan? = null
+
+                for (barcode in barcodes) {
+                    val raw = barcode.rawValue
+                    if (raw != null) {
+                        val parsed = UpiParser.parse(raw)
+                        if (parsed != null) {
+                            matchedScan = parsed
+                            break
+                        }
+                    }
                 }
 
-                if (match != null && scanned.compareAndSet(false, true)) {
+                if (matchedScan != null && scanned.compareAndSet(false, true)) {
                     vibrateOnce()
                     runOnUiThread {
                         val intent = Intent(this, PaymentActivity::class.java).apply {
-                            putExtra(PaymentActivity.EXTRA_UPI_ID, match.upiId)
-                            putExtra(PaymentActivity.EXTRA_NAME, match.payeeName.orEmpty())
-                            putExtra(PaymentActivity.EXTRA_AMOUNT, match.amount.orEmpty())
+                            putExtra(PaymentActivity.EXTRA_UPI_ID, matchedScan!!.upiId)
+                            putExtra(PaymentActivity.EXTRA_NAME, matchedScan!!.payeeName.orEmpty())
+                            putExtra(PaymentActivity.EXTRA_AMOUNT, matchedScan!!.amount.orEmpty())
                         }
                         startActivity(intent)
                         finish()
                     }
                 }
             }
-            .addOnFailureListener { }
+            .addOnFailureListener {
+                // Ignore scan errors and keep the camera running.
+            }
             .addOnCompleteListener {
                 imageProxy.close()
             }
