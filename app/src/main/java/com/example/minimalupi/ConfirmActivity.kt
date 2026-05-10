@@ -109,7 +109,7 @@ class ConfirmActivity : AppCompatActivity() {
 
         lifecycleScope.launch {
             delay(AppConfig.SEND_DELAY_MS)
-            startActivity(DialerHelper.buildDialIntent())
+            startActivity(DialerHelper.buildDialIntent(this@ConfirmActivity))
             finish()
         }
     }
