@@ -6,7 +6,20 @@
     <string name="history">History</string>
     <string name="amount_hint">Amount</string>
     <string name="pay_button_default">Pay</string>
+    <string name="pay_button_amount">Pay ₹%1$s</string>
+    <string name="add_amount_error">Add amount</string>
     <string name="hold_to_pay">Hold to Pay</string>
     <string name="sending">Sending…</string>
     <string name="no_recent_payments">No recent payments</string>
+    <string name="unknown_receiver">Unknown Receiver</string>
+    <string name="confirm_amount">₹%1$s</string>
+    <string name="risk_first_time">First time</string>
+    <string name="risk_new_receiver">New receiver</string>
+    <string name="risk_no_name_in_qr">No name in QR</string>
+    <string name="risk_receiver_seen_before">Receiver seen before</string>
+    <string name="risk_no_saved_name">No saved name</string>
+    <string name="risk_known">Known</string>
+    <string name="risk_name_match">Name matches past record</string>
+    <string name="risk_mismatch">Mismatch</string>
+    <string name="risk_name_changed">Name changed from past record</string>
 </resources>

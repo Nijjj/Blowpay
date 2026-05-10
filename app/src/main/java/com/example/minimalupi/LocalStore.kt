@@ -62,32 +62,32 @@ object LocalStore {
         return when {
             payee == null -> VerificationState(
                 riskLevel = RiskLevel.YELLOW,
-                label = "First time",
-                detail = "New receiver"
+                label = context.getString(R.string.risk_first_time),
+                detail = context.getString(R.string.risk_new_receiver)
             )
 
             currentName == null -> VerificationState(
                 riskLevel = RiskLevel.YELLOW,
-                label = "No name in QR",
-                detail = "Receiver seen before"
+                label = context.getString(R.string.risk_no_name_in_qr),
+                detail = context.getString(R.string.risk_receiver_seen_before)
             )
 
             savedName == null -> VerificationState(
                 riskLevel = RiskLevel.YELLOW,
-                label = "No saved name",
-                detail = "Receiver seen before"
+                label = context.getString(R.string.risk_no_saved_name),
+                detail = context.getString(R.string.risk_receiver_seen_before)
             )
 
             UpiParser.normalizeName(currentName) == UpiParser.normalizeName(savedName) -> VerificationState(
                 riskLevel = RiskLevel.GREEN,
-                label = "Known",
-                detail = "Name matches past record"
+                label = context.getString(R.string.risk_known),
+                detail = context.getString(R.string.risk_name_match)
             )
 
             else -> VerificationState(
                 riskLevel = RiskLevel.RED,
-                label = "Mismatch",
-                detail = "Name changed from past record"
+                label = context.getString(R.string.risk_mismatch),
+                detail = context.getString(R.string.risk_name_changed)
             )
         }
     }

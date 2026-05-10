@@ -52,12 +52,12 @@ class ConfirmActivity : AppCompatActivity() {
         name = intent.getStringExtra(EXTRA_NAME).orEmpty()
         amount = intent.getStringExtra(EXTRA_AMOUNT).orEmpty()
 
-        val displayName = name.takeIf { it.isNotBlank() } ?: "Unknown Receiver"
+        val displayName = name.takeIf { it.isNotBlank() } ?: getString(R.string.unknown_receiver)
         val scan = UpiScan(upiId = upiId, payeeName = name.takeIf { it.isNotBlank() }, amount = amount)
         val verification = LocalStore.verify(this, scan)
         val providerGuess = ProviderHeuristics.guess(upiId)
 
-        amountText.text = "₹$amount"
+        amountText.text = getString(R.string.confirm_amount, amount)
         nameText.text = displayName
         upiText.text = upiId
         providerText.text = providerGuess

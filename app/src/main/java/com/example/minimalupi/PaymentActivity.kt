@@ -43,7 +43,7 @@ class PaymentActivity : AppCompatActivity() {
         recipientText.text = if (name.isNotBlank()) name else upiId
         upiText.text = upiId
 
-        if (scanAmount.isNotBlank()) amountInput.setText(scanAmount)
+        if (scanAmount.isNotBlank()) amountInput.setText(UpiParser.formatAmount(scanAmount))
         amountInput.setSelection(amountInput.text?.length ?: 0)
         amountInput.requestFocus()
         amountInput.imeOptions = EditorInfo.IME_ACTION_DONE
@@ -59,7 +59,7 @@ class PaymentActivity : AppCompatActivity() {
         payButton.setOnClickListener {
             val amount = amountInput.text?.toString().orEmpty().trim()
             if (amount.isBlank()) {
-                amountInput.error = "Add amount"
+                amountInput.error = getString(R.string.add_amount_error)
                 return@setOnClickListener
             }
 
@@ -78,7 +78,7 @@ class PaymentActivity : AppCompatActivity() {
         payButton.text = if (amount.isBlank()) {
             getString(R.string.pay_button_default)
         } else {
-            "Pay ₹$amount"
+            getString(R.string.pay_button_amount, amount)
         }
     }
 }
