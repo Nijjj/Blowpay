@@ -1,16 +1,13 @@
-name: Build APK
+name: Lint
 
 on:
-  push:
-    branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
   workflow_dispatch:
 
 jobs:
-  build:
+  lint:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -30,10 +27,7 @@ jobs:
         uses: android-actions/setup-android@v3
 
       - name: Install SDK packages
-        shell: bash
-        run: |
-          set -eux
-          sdkmanager "platform-tools" "platforms;android-34" "build-tools;34.0.0"
+        run: sdkmanager "platforms;android-34" "build-tools;34.0.0"
 
       - name: Accept licenses
         shell: bash
@@ -42,14 +36,5 @@ jobs:
           yes | sdkmanager --licenses >/dev/null 2>&1
           true
 
-      - name: Install Gradle
-        run: gradle --version
-
-      - name: Build debug APK
-        run: gradle :app:assembleDebug --stacktrace
-
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: app-debug-apk
-          path: app/build/outputs/apk/debug/app-debug.apk
+      - name: Run Android lint
+        run: gradle :app:lintDebug --stacktrace
