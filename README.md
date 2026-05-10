@@ -1,42 +1,54 @@
 # Minimal UPI Lite
 
-A lightweight Android Studio project for fast QR-based UPI entry with:
-- CameraX preview + ML Kit barcode scanning
-- Minimal dark payment screen
-- Full-screen hold-to-pay confirmation
-- Local payee verification
-- 24-hour transaction history
-- ACTION_DIAL handoff for IVR / USSD-style completion
+Lightweight Android app for fast QR-based UPI handoff with low UI overhead:
+- CameraX preview + ML Kit barcode scan
+- Minimal pay entry flow
+- Hold-to-pay confirmation gate
+- Local receiver verification
+- 24-hour local history
+- `ACTION_DIAL` handoff for IVR/USSD-style completion
 
-## Project structure
+## Architecture
 
-- `ScannerActivity` — QR scanner
-- `PaymentActivity` — amount entry
-- `ConfirmActivity` — hold-to-pay gate
-- `HistoryActivity` — recent payments
-- `LocalStore` — SharedPreferences JSON storage
-- `UpiParser` — parses `upi://pay` payloads
-- `ProviderHeuristics` — label guesses based on UPI handle
+- `MainActivity`: launcher redirect
+- `ScannerActivity`: camera + QR parse
+- `PaymentActivity`: amount entry
+- `ConfirmActivity`: verification + hold gate
+- `HistoryActivity`: recent transactions
+- `LocalStore`: SharedPreferences JSON persistence
+- `UpiParser`: `upi://pay` parser
+- `ProviderHeuristics`: UPI handle provider guess
 
-## Notes
+## Security/Scope
 
-- This app does **not** process payments internally.
-- It does **not** collect or store a UPI PIN.
-- It uses the dialer as the final handoff step.
-- Set `AppConfig.IVR_NUMBER` if you want a prefilled dialer number.
+- No in-app payment processing
+- No UPI PIN collection/storage
+- Final user action happens in dialer
+
+## Termux + Android Notes
+
+- This repo is native Android (Gradle/Kotlin), not a Node/Vite project.
+- Target platform is Android ARM64; minSdk 24, targetSdk 34.
+- Keep dependencies lightweight and avoid native-heavy toolchains.
+- If you build in Termux, install compatible JDK + Gradle first.
 
 ## Build
 
-Open the folder in Android Studio and sync Gradle.
-If Android Studio suggests newer dependency versions, you can update them in `app/build.gradle.kts`.
+### Android Studio
+1. Open this folder.
+2. Sync Gradle.
+3. Build `debug` APK.
 
+### CLI (with Gradle installed)
+```bash
+gradle :app:assembleDebug
+```
 
-## GitHub Actions build
+## CI Workflows
 
-A ready workflow is included at `.github/workflows/build.yml`.
+- `.github/workflows/build.yml`: debug APK build + artifact upload
+- `.github/workflows/lint.yml`: Android lint for PR validation
 
-To build the APK on GitHub:
-1. Push the repo to GitHub.
-2. Open the Actions tab.
-3. Run the **Build APK** workflow.
-4. Download the `app-debug-apk` artifact.
+## Config
+
+Update `AppConfig.IVR_NUMBER` in `app/src/main/java/com/example/minimalupi/AppConfig.kt` to prefill a dialer number.
